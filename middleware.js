@@ -5,26 +5,40 @@ import Negotiator from 'negotiator'
 let defaultLocale = 'en'
 let locales = ['bn', 'en']
 
+// Get the preferred locale, similar to above or using a library
+function getLocale(request) {
+  const acceptedLanguage = request.headers.get('accept-language') ?? undefined
+  let headers = { 'accept-language': acceptedLanguage }
+  let languages = new Negotiator({ headers }).languages()
 
-function getLocale(request) 
-{
-   // url a j request ta asbe setar modhe accept-language name ekta property thakbe 
-    const acceptedLanuage = request.headers.get('accept-language') ?? undefined;
+  console.log(languages);
 
-    // ekhne dekhbo ei langauge ta amader locales er j lanuage er modhe ase tar sateh mile naki
-     
-    let headers ={"accept-language":acceptedLanuage}
-
-    let langauges = new Negotiator({headers}).languages()
-
-    return match(langauges, locales, defaultLocale)
-
+  return match(languages, locales, defaultLocale) // -> 'en-US'
 }
 
-// ekhn likbo middleware ta vlo kre ...
+export function middleware(request) {
+  // Check if there is any supported locale in the pathname
+  const pathname = request.nextUrl.pathname
 
-export function middleware(request) 
-{
-    // eta server side a use hoy
-    const pathname = request.nextUrl.pathname;
+  const pathnameIsMissingLocale = locales.every(
+    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
+  )
+
+  // Redirect if there is no locale
+  if (pathnameIsMissingLocale) {
+    const locale = getLocale(request)
+
+    // e.g. incoming request is /products
+    // The new URL is now /en-US/products
+    return NextResponse.redirect(new URL(`/${locale}/${pathname}`, request.url))
+  }
+}
+
+export const config = {
+  matcher: [
+    // Skip all internal paths (_next, assets, api)
+    '/((?!api|assets|.*\\..*|_next).*)',
+    // Optional: only run on root (/) URL
+    // '/'
+  ],
 }
