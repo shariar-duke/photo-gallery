@@ -3,7 +3,7 @@ import { getDictionary } from "../[lang]/dictionaries";
 
 import Image from "next/image";
 
-const PhotoDetails = async ({ id = "94a7e01b-8576-4d18-8b84-6ae588db02d9", lang }) => {
+const PhotoDetails = async ({ id, lang }) => {
 
 
   const response = await fetch(`${process.env.BASE_API_URL}/photos/${id}`);
