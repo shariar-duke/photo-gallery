@@ -1,9 +1,8 @@
-import PhotoDetails from "@/app/components/PhotoDetails"
-export default function PhotoDetailsPage({params:{id}}) {
+import PhotoDetails from "@/app/components/PhotoDetails";
+export default function PhotoDetailsPage({ params: { id, lang } }) {
   return (
     <div>
-
-        <PhotoDetails/>
+      <PhotoDetails id={id} lang={lang} />
     </div>
-  )
+  );
 }
